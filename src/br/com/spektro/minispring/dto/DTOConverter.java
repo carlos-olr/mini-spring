@@ -1,5 +1,7 @@
 package br.com.spektro.minispring.dto;
 
+import java.util.List;
+
 /**
  * @author Carlos Oliveira
  * @param <E>
@@ -11,6 +13,10 @@ public interface DTOConverter<E, D> {
 
 	D toDTO(E entidade);
 
-	E toEntity(D DTO);
+	E toEntity(D dto);
+
+	List<D> toDTO(List<E> entidades);
+
+	List<E> toEntity(List<D> dtos);
 
 }

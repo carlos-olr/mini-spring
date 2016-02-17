@@ -4,6 +4,8 @@
 bin/
 tmp/
 *.tmp
+*.class
+target
 *.bak
 *.swp
 *~.nib

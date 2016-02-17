@@ -1,6 +1,5 @@
 package br.com.spektro.minispring.core.implfinder;
 
-import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Set;
 
@@ -9,20 +8,19 @@ import org.reflections.Reflections;
 import com.google.common.collect.Maps;
 
 import br.com.spektro.minispring.api.implfinder.ImplFinderException;
-import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
-public class ImplementationFinder {
+public class ImplFinder {
 
-	private static ImplementationFinder instance;
+	private static ImplFinder instance;
 
 	private Map<Class, Object> cache = Maps.newHashMap();
 
-	private ImplementationFinder() {
+	private ImplFinder() {
 	}
 
-	private static ImplementationFinder getinstance() {
+	private static ImplFinder getinstance() {
 		if (instance == null) {
-			instance = new ImplementationFinder();
+			instance = new ImplFinder();
 		}
 		return instance;
 	}
@@ -60,32 +58,20 @@ public class ImplementationFinder {
 		return interfaceToFind.cast(instanceClass);
 	}
 
-	public static <I extends Object> I getImpl(Class<I> interfaceToFind,
-			Class entityToFind) {
-		return getinstance().getImplementation(interfaceToFind, entityToFind);
+	public static <I extends Object> I getFinalImpl(Class<I> implClass) {
+		return getinstance().getFinalImplementation(implClass);
 	}
 
-	private <I extends Object> I getImplementation(Class<I> interfaceToFind,
-			Class entityToFind) {
-		Reflections ref = new Reflections(ContextSpecifier.getContext() + ".core");
-		Set subTypesOf = ref.getSubTypesOf(interfaceToFind);
-
-		Object[] subTypes = subTypesOf.toArray();
-
-		for (int i = 0; i < subTypes.length; i++) {
-			Class klass = (Class) subTypes[i];
-			Type[] types = klass.getGenericInterfaces();
-			if (types.length != 0) {
-				ParameterizedTypeImpl type = (ParameterizedTypeImpl) types[0];
-				Class entityKlassType = (Class) type.getActualTypeArguments()[0];
-				if (entityKlassType.equals(entityToFind)) {
-					try {
-						return interfaceToFind.cast(klass.newInstance());
-					} catch (InstantiationException | IllegalAccessException e) {
-						e.printStackTrace();
-					}
-				}
-			}
+	private <I extends Object> I getFinalImplementation(Class<I> implClass) {
+		if (this.cache.containsKey(implClass)) {
+			return implClass.cast(this.cache.get(implClass));
+		}
+		try {
+			I newInstance = implClass.newInstance();
+			this.cache.put(implClass, newInstance);
+			return newInstance;
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return null;
 	}
