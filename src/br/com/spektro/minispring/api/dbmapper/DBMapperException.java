@@ -1,6 +1,5 @@
 package br.com.spektro.minispring.api.dbmapper;
 
-
 public class DBMapperException extends RuntimeException {
 
 	/** */
@@ -9,7 +8,7 @@ public class DBMapperException extends RuntimeException {
 	public DBMapperException(String message) {
 		super(message);
 	}
-	
+
 	public DBMapperException(String message, Exception e) {
 		super(message, e);
 	}

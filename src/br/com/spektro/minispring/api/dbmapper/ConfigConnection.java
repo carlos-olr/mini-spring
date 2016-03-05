@@ -12,6 +12,7 @@ public class ConfigConnection {
 	private String url;
 	private String login;
 	private String password;
+	private Class dbClass;
 
 	/**
 	 * @return name
@@ -75,12 +76,21 @@ public class ConfigConnection {
 	 * @param login
 	 * @param password
 	 */
-	public ConfigConnection(String name, String url, String login,
-			String password) {
+	public ConfigConnection(String name, String url, String login, String password,
+			Class dbClass) {
 		this.name = name;
 		this.url = url;
 		this.login = login;
 		this.password = password;
+		this.setDbClass(dbClass);
+	}
+
+	public Class getDbClass() {
+		return dbClass;
+	}
+
+	public void setDbClass(Class dbClass) {
+		this.dbClass = dbClass;
 	}
 
 }

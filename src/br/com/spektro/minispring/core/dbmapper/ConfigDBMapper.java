@@ -57,15 +57,21 @@ public class ConfigDBMapper {
 	 *         não existisse no momento de load das configs
 	 */
 	public static Connection getConnectionByConfig(String configName) {
-		if (!Strings.isNullOrEmpty(configName) && configConnections.containsKey(configName)) {
+		if (!Strings.isNullOrEmpty(configName)
+				&& configConnections.containsKey(configName)) {
 			ConfigConnection configConnection = configConnections.get(configName);
 			try {
-				return DriverManager.getConnection(configConnection.getUrl(), configConnection.getLogin(), configConnection.getPassword());
+				return DriverManager.getConnection(configConnection.getUrl(),
+						configConnection.getLogin(), configConnection.getPassword());
 			} catch (SQLException e) {
-				throw new DBMapperException("Não foi possível geral uma conexão pra o Banco de Dados '" + configName + "'.", e);
+				throw new DBMapperException(
+						"Não foi possível geral uma conexão pra o Banco de Dados '"
+								+ configName + "'.",
+						e);
 			}
 		}
-		throw new DBMapperException("Não existe configuração com nome '" + configName + "'.");
+		throw new DBMapperException(
+				"Não existe configuração com nome '" + configName + "'.");
 	}
 
 	/**
@@ -80,30 +86,35 @@ public class ConfigDBMapper {
 			// arquivo de configurações. Para isso vamos utilizar nosso 'loader'
 			// para pegar o 'path' do mesmo.
 			String context = ContextSpecifier.getContext().replace(".", "/");
-			String path = loader.getResource(context + "/core/databases.properties").getPath();
+			String path = loader.getResource(context + "/core/databases.properties")
+					.getPath();
 			// Com 'path em mãos iremos converter, fazer 'parse', de seu
 			// conteúdo para um objeto JSONArray, já que o arquivo começa
 			// com '[..]', ou seja, o arquivo é um array.
 			prop.load(new FileReader(path));
 
 			if (!getInstance().isValid(prop)) {
-				throw new DBMapperException("É necessário ao menos uma configuração de Banco de Dados");
+				throw new DBMapperException(
+						"É necessário ao menos uma configuração de Banco de Dados");
 			}
 
 			int length = prop.size() / 5;
 
 			for (int i = 1; i <= length; i++) {
 				String keyBase = "database" + i + ".";
-				Class.forName(prop.getProperty(keyBase + "driverClassName"));
-				configConnections.put(
-						prop.getProperty(keyBase + "name"),
-						new ConfigConnection(prop.getProperty(keyBase + "name"), prop.getProperty(keyBase + "url"), prop.getProperty(keyBase
-								+ "login"), prop.getProperty(keyBase + "password")));
+				Class dbClass = Class
+						.forName(prop.getProperty(keyBase + "driverClassName"));
+				configConnections.put(prop.getProperty(keyBase + "name"),
+						new ConfigConnection(prop.getProperty(keyBase + "name"),
+								prop.getProperty(keyBase + "url"),
+								prop.getProperty(keyBase + "login"),
+								prop.getProperty(keyBase + "password"), dbClass));
 			}
-			getInstance().possibleConfigs = new
-					ArrayList<String>(configConnections.keySet());
+			getInstance().possibleConfigs = new ArrayList<String>(
+					configConnections.keySet());
 		} catch (Exception e) {
-			throw new DBMapperException("Erro ao carregar configurações de banco de dados", e);
+			throw new DBMapperException(
+					"Erro ao carregar configurações de banco de dados", e);
 		}
 	}
 
@@ -122,6 +133,14 @@ public class ConfigDBMapper {
 		return getInstance().getConnectionByConfig(getInstance().defaultConnectionName);
 	}
 
+	public static Class getDefaultConnectionType() {
+		if (getInstance().defaultConnectionName == null) {
+			return null;
+		}
+		return getInstance().configConnections.get(getInstance().defaultConnectionName)
+				.getDbClass();
+	}
+
 	/**
 	 * Esse método possui uma iteligência que pode parecer uma pegadinha. Ele
 	 * faz com que a propriedade 'defaultConnectionName' receba valor uma única
@@ -133,11 +152,13 @@ public class ConfigDBMapper {
 	 * @param config
 	 */
 	public static void setDefaultConnectionName(String config) {
-		if (getInstance().defaultConnectionName == null && (!Strings.isNullOrEmpty(config))) {
+		if (getInstance().defaultConnectionName == null
+				&& (!Strings.isNullOrEmpty(config))) {
 			if (getInstance().possibleConfigs.contains(config)) {
 				getInstance().defaultConnectionName = config;
 			} else {
-				throw new DBMapperException("Não existe configuração com nome '" + config + "'.");
+				throw new DBMapperException(
+						"Não existe configuração com nome '" + config + "'.");
 			}
 		}
 	}
@@ -145,7 +166,7 @@ public class ConfigDBMapper {
 	public static String getDefaultConnectionName() {
 		return getInstance().defaultConnectionName;
 	}
-	
+
 	/**
 	 * @return lista com todos os nomes de configurações disponíveis, essa lista
 	 *         é criada a patir do método 'loadConnections'
@@ -153,5 +174,5 @@ public class ConfigDBMapper {
 	public static List<String> getPossibleConfigs() {
 		return getInstance().possibleConfigs;
 	}
-	
+
 }

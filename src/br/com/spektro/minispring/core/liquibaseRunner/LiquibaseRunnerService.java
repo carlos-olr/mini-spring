@@ -20,9 +20,11 @@ public class LiquibaseRunnerService {
 	public static void run() {
 		Connection conn = ConfigDBMapper.getDefaultConnection();
 		try {
-			Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(
-					new JdbcConnection(conn));
-			Liquibase liquibase = new Liquibase(ContextSpecifier.getContextAsFile() + "/liquibase/changelog-master.xml",
+			Database database = DatabaseFactory.getInstance()
+					.findCorrectDatabaseImplementation(new JdbcConnection(conn));
+			Liquibase liquibase = new Liquibase(
+					ContextSpecifier.getContextAsFile()
+							+ "/liquibase/changelog-master.xml",
 					new ClassLoaderResourceAccessor(), database);
 			liquibase.forceReleaseLocks();
 			liquibase.update(ConfigDBMapper.getDefaultConnectionName());

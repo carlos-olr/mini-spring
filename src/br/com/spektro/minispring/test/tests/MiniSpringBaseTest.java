@@ -10,5 +10,5 @@ public class MiniSpringBaseTest {
 	public void setUp() {
 		ContextSpecifier.setContext("br.com.spektro.minispring.test.testcenario");
 	}
-	
+
 }

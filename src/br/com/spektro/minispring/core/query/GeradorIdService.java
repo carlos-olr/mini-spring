@@ -43,7 +43,8 @@ public class GeradorIdService {
 		try {
 			// Iremos considerar essa tabela no SQL que irá retornar o NEXT_ID
 			connection = ConfigDBMapper.getDefaultConnection();
-			query = connection.prepareStatement("SELECT NEXT_ID FROM GERADOR_IDS WHERE TABLE_NAME = ?;");
+			query = connection.prepareStatement(
+					"SELECT NEXT_ID FROM GERADOR_IDS WHERE TABLE_NAME = ?;");
 			query.setString(1, tableName); // Não se esqueça de fazer o set da
 											// 'tableName'
 			ResultSet resultNextId = query.executeQuery();
@@ -51,7 +52,8 @@ public class GeradorIdService {
 			Long idSequence = resultNextId.getLong("NEXT_ID");
 			// Agora iremos atualizar o valor do NEXT_ID na Tabela, também
 			// utilizando o tableName
-			updateID = connection.prepareStatement("UPDATE GERADOR_IDS SET NEXT_ID = ? WHERE TABLE_NAME = ?;");
+			updateID = connection.prepareStatement(
+					"UPDATE GERADOR_IDS SET NEXT_ID = ? WHERE TABLE_NAME = ?;");
 			updateID.setLong(1, idSequence + 1); // o '+ 1' é para incrementar o
 													// nextId
 			updateID.setString(2, tableName); // Não se esqueça de fazer o set
@@ -59,7 +61,8 @@ public class GeradorIdService {
 			updateID.execute();
 			return idSequence;
 		} catch (SQLException e) {
-			throw new RuntimeException("Erro ao pegar ID para a tabela '" + tableName + "'", e);
+			throw new RuntimeException(
+					"Erro ao pegar ID para a tabela '" + tableName + "'", e);
 		} finally {
 			DbUtils.closeQuietly(updateID);
 			DbUtils.closeQuietly(query);
